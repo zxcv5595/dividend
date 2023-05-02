@@ -10,19 +10,24 @@ import com.example.dividend.repository.CompanyRepository;
 import com.example.dividend.repository.DividendRepository;
 import com.example.dividend.type.ErrorCode;
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
+import org.springframework.cache.annotation.Cacheable;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
-import java.util.Optional;
 import java.util.stream.Collectors;
 
 @Service
+@Slf4j
 @RequiredArgsConstructor
 public class FinanceService {
 
     private final CompanyRepository companyRepository;
     private final DividendRepository dividendRepository;
-    public ScrapedResult dividendByCompanyName(String companyName){
+
+    @Cacheable(key = "#companyName", value = "finance")
+    public ScrapedResult dividendByCompanyName(String companyName) {
+        log.info("search company -> '{}'", companyName);
         Company company = companyRepository.findByName(companyName)
                 .orElseThrow(() -> new ScrapException(ErrorCode.NOT_EXIST_COMPANY));
 
