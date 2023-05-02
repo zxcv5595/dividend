@@ -4,6 +4,8 @@ import com.example.dividend.domain.Company;
 import com.example.dividend.dto.CompanyDto;
 import com.example.dividend.service.CompanyService;
 import lombok.RequiredArgsConstructor;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 import org.springframework.http.ResponseEntity;
 import org.springframework.util.ObjectUtils;
 import org.springframework.web.bind.annotation.*;
@@ -19,12 +21,13 @@ public class CompanyController {
 
     @GetMapping("/autocomplete")
     public ResponseEntity<?> autoComplete(@RequestParam String keyword){
-        return null;
+        List<String> result = companyService.autoComplete(keyword);
+        return ResponseEntity.ok(result);
     }
 
     @GetMapping
-    public ResponseEntity<?> searchCompany(){
-        List<Company> companies = companyService.getAllCompany();
+    public ResponseEntity<?> searchCompany(final Pageable pageable){
+        Page<Company> companies = companyService.getAllCompany(pageable);
         return ResponseEntity.ok(companies);
     }
 
@@ -35,6 +38,7 @@ public class CompanyController {
             throw new RuntimeException("ticker is empty");
         }
         CompanyDto companyDto = companyService.save(ticker);
+        companyService.autoCompleteKeyword(companyDto.getName());
 
         return ResponseEntity.ok(companyDto);
     }
