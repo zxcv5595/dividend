@@ -2,6 +2,7 @@ package com.example.dividend.scheduler;
 
 import com.example.dividend.domain.Company;
 import com.example.dividend.domain.Dividend;
+import com.example.dividend.dto.CacheKey;
 import com.example.dividend.dto.CompanyDto;
 import com.example.dividend.dto.ScrapedResult;
 import com.example.dividend.repository.CompanyRepository;
@@ -9,6 +10,7 @@ import com.example.dividend.repository.DividendRepository;
 import com.example.dividend.scraper.Scraper;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.cache.annotation.CacheEvict;
 import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Component;
 
@@ -23,6 +25,8 @@ public class ScraperScheduler {
     private final DividendRepository dividendRepository;
     private final Scraper yahooFinanceScraper;
 
+    //일정 주기마다 실행
+    @CacheEvict(value = CacheKey.KEY_FINANCE,allEntries = true)
     @Scheduled(cron = "${scheduler.scrap.yahoo}")
     public void YahooFinanceScheduling() {
         log.info("scraping scheduler is started ");

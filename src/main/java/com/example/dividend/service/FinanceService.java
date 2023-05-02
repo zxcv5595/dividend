@@ -2,6 +2,7 @@ package com.example.dividend.service;
 
 import com.example.dividend.domain.Company;
 import com.example.dividend.domain.Dividend;
+import com.example.dividend.dto.CacheKey;
 import com.example.dividend.dto.CompanyDto;
 import com.example.dividend.dto.DividendDto;
 import com.example.dividend.dto.ScrapedResult;
@@ -25,7 +26,7 @@ public class FinanceService {
     private final CompanyRepository companyRepository;
     private final DividendRepository dividendRepository;
 
-    @Cacheable(key = "#companyName", value = "finance")
+    @Cacheable(key = "#companyName", value = CacheKey.KEY_FINANCE)
     public ScrapedResult dividendByCompanyName(String companyName) {
         log.info("search company -> '{}'", companyName);
         Company company = companyRepository.findByName(companyName)
