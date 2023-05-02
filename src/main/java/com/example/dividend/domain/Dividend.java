@@ -3,10 +3,7 @@ package com.example.dividend.domain;
 import com.example.dividend.dto.DividendDto;
 import lombok.*;
 
-import javax.persistence.Entity;
-import javax.persistence.GeneratedValue;
-import javax.persistence.GenerationType;
-import javax.persistence.Id;
+import javax.persistence.*;
 import java.time.LocalDateTime;
 
 @Getter
@@ -15,6 +12,13 @@ import java.time.LocalDateTime;
 @AllArgsConstructor
 @Builder
 @Entity(name = "DIVIDEND")
+@Table(
+        uniqueConstraints = {
+                @UniqueConstraint(
+                        columnNames = {"companyId","date"}
+                )
+        }
+)
 public class Dividend {
 
 

@@ -12,6 +12,7 @@ import com.example.dividend.type.ErrorCode;
 import lombok.RequiredArgsConstructor;
 import org.apache.commons.collections4.Trie;
 import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 import org.springframework.util.ObjectUtils;
@@ -75,5 +76,12 @@ public class CompanyService {
         trie.remove(keyword);
     }
 
+    public List<String> getCompanyNameByKeyword(String keyword){
+        Pageable limit = PageRequest.of(0,10);
+        Page<Company> companies = companyRepository.findByNameStartingWithIgnoreCase(keyword,limit);
+        return companies.stream()
+                .map(Company::getName)
+                .collect(Collectors.toList());
+    }
 
 }
