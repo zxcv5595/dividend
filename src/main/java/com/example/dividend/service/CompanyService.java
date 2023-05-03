@@ -8,22 +8,24 @@ import com.example.dividend.exception.ScrapException;
 import com.example.dividend.repository.CompanyRepository;
 import com.example.dividend.repository.DividendRepository;
 import com.example.dividend.scraper.YahooFinanceScraper;
-import com.example.dividend.type.ErrorCode;
 import lombok.RequiredArgsConstructor;
 import org.apache.commons.collections4.Trie;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 import org.springframework.util.ObjectUtils;
 
 import java.util.List;
 import java.util.stream.Collectors;
 
-import static com.example.dividend.type.ErrorCode.*;
+import static com.example.dividend.type.ErrorCode.ALREADY_SAVED_COMPANY;
+import static com.example.dividend.type.ErrorCode.NOT_EXIST_COMPANY;
 
 @Service
 @RequiredArgsConstructor
+@Transactional
 public class CompanyService {
 
     private final Trie trie;
@@ -63,27 +65,37 @@ public class CompanyService {
         return companyDto;
     }
 
-    public  void autoCompleteKeyword(String keyword){
-        trie.put(keyword,null);
+    public void autoCompleteKeyword(String keyword) {
+        trie.put(keyword, null);
     }
 
-    public List<String> autoComplete(String keyword){
+    public List<String> autoComplete(String keyword) {
         return (List<String>) trie.prefixMap(keyword).keySet()
                 .stream()
                 .limit(10)
                 .collect(Collectors.toList());
     }
 
-    public void deleteKeyword(String keyword){
+    public void deleteKeyword(String keyword) {
         trie.remove(keyword);
     }
 
-    public List<String> getCompanyNameByKeyword(String keyword){
-        Pageable limit = PageRequest.of(0,10);
-        Page<Company> companies = companyRepository.findByNameStartingWithIgnoreCase(keyword,limit);
+    public List<String> getCompanyNameByKeyword(String keyword) {
+        Pageable limit = PageRequest.of(0, 10);
+        Page<Company> companies = companyRepository.findByNameStartingWithIgnoreCase(keyword, limit);
         return companies.stream()
                 .map(Company::getName)
                 .collect(Collectors.toList());
     }
 
+    public String deleteCompany(String ticker) {
+        Company company = companyRepository.findByTicker(ticker)
+                .orElseThrow(() -> new ScrapException(NOT_EXIST_COMPANY));
+        dividendRepository.deleteByCompanyId(company.getId());
+        companyRepository.delete(company);
+
+        deleteKeyword(company.getName());
+
+        return company.getName();
+    }
 }

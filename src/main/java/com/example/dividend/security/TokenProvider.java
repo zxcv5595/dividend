@@ -1,11 +1,15 @@
 package com.example.dividend.security;
 
+import com.example.dividend.service.MemberService;
 import io.jsonwebtoken.Claims;
 import io.jsonwebtoken.ExpiredJwtException;
 import io.jsonwebtoken.Jwts;
 import io.jsonwebtoken.SignatureAlgorithm;
 import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Value;
+import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
+import org.springframework.security.core.Authentication;
+import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.stereotype.Component;
 import org.springframework.util.StringUtils;
 
@@ -17,6 +21,7 @@ import java.util.List;
 public class TokenProvider {
     private static final String KEY_ROLES = "roles";
     private static final long EXPIRED_TIME = 1000 * 60 * 60; // 1 hour
+    private final MemberService memberService;
     @Value("${spring.jwt.secret}")
     private String secretKey;
 
@@ -35,6 +40,11 @@ public class TokenProvider {
                 .compact();
     }
 
+    public Authentication getAuthentication(String jwt){
+        UserDetails userDetails = memberService.loadUserByUsername(getUsername(jwt));
+        return new UsernamePasswordAuthenticationToken(userDetails,"",userDetails.getAuthorities());
+    }
+
     public String getUsername(String token){
         return paresClaims(token).getSubject();
     }
@@ -44,7 +54,7 @@ public class TokenProvider {
             return false;
         }
         Claims claims = paresClaims(token);
-        return claims.getExpiration().before(new Date());
+        return !claims.getExpiration().before(new Date());
     }
 
     private Claims paresClaims(String token) {

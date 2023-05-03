@@ -32,9 +32,9 @@ public class Auth {
 
         public Member fromEntity() {
             return Member.builder()
-                    .username(username)
-                    .password(password)
-                    .roles(roles)
+                    .username(this.username)
+                    .password(this.password)
+                    .roles(this.roles)
                     .build();
         }
     }
