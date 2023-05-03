@@ -13,6 +13,8 @@ import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 
+import static com.example.dividend.type.ErrorCode.*;
+
 @Slf4j
 @Service
 @RequiredArgsConstructor
@@ -30,7 +32,7 @@ public class MemberService implements UserDetailsService {
     public Member register(Auth.SignUp member) {
         boolean exists = memberRepository.existsByUsername(member.getUsername());
         if (exists) {
-            throw new SecurityException(ErrorCode.ALREADY_EXIST_USER);
+            throw new SecurityException(ALREADY_EXIST_USER);
         }
 
         member.setPassword(passwordEncoder.encode(member.getPassword()));
@@ -39,6 +41,12 @@ public class MemberService implements UserDetailsService {
     }
 
     public Member authenticate(Auth.SignIn member) {
-        return null;
+        Member user = memberRepository.findByUsername(member.getUsername())
+                .orElseThrow(() -> new SecurityException(NOT_EXIST_ID));
+
+        if(!passwordEncoder.matches(member.getPassword(), user.getPassword())){
+            throw new SecurityException(NOT_MATCHED_PASSWORD);
+        }
+        return user;
     }
 }

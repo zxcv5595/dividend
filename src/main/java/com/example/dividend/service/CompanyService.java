@@ -20,6 +20,8 @@ import org.springframework.util.ObjectUtils;
 import java.util.List;
 import java.util.stream.Collectors;
 
+import static com.example.dividend.type.ErrorCode.*;
+
 @Service
 @RequiredArgsConstructor
 public class CompanyService {
@@ -32,7 +34,7 @@ public class CompanyService {
     public CompanyDto save(String ticker) {
         boolean exists = companyRepository.existsByTicker(ticker);
         if (exists) {
-            throw new ScrapException(ErrorCode.ALREADY_SAVED_COMPANY);
+            throw new ScrapException(ALREADY_SAVED_COMPANY);
         }
         return storeCompanyAndDividend(ticker);
     }
@@ -45,7 +47,7 @@ public class CompanyService {
         CompanyDto companyDto = yahooFinanceScraper.scrapCompanyByTicker(ticker);
 
         if (ObjectUtils.isEmpty(companyDto)) {
-            throw new ScrapException(ErrorCode.NOT_EXIST_COMPANY);
+            throw new ScrapException(NOT_EXIST_COMPANY);
         }
 
         Company company = companyRepository.save(new Company(companyDto));

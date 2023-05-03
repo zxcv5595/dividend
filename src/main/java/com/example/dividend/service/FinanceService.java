@@ -18,6 +18,9 @@ import org.springframework.stereotype.Service;
 import java.util.List;
 import java.util.stream.Collectors;
 
+import static com.example.dividend.dto.CacheKey.*;
+import static com.example.dividend.type.ErrorCode.*;
+
 @Service
 @Slf4j
 @RequiredArgsConstructor
@@ -26,11 +29,11 @@ public class FinanceService {
     private final CompanyRepository companyRepository;
     private final DividendRepository dividendRepository;
 
-    @Cacheable(key = "#companyName", value = CacheKey.KEY_FINANCE)
+    @Cacheable(key = "#companyName", value = KEY_FINANCE)
     public ScrapedResult dividendByCompanyName(String companyName) {
         log.info("search company -> '{}'", companyName);
         Company company = companyRepository.findByName(companyName)
-                .orElseThrow(() -> new ScrapException(ErrorCode.NOT_EXIST_COMPANY));
+                .orElseThrow(() -> new ScrapException(NOT_EXIST_COMPANY));
 
         List<Dividend> dividendEntities = dividendRepository.findByCompanyId(company.getId());
 
