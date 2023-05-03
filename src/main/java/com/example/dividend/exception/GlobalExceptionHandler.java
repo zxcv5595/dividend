@@ -21,6 +21,13 @@ public class GlobalExceptionHandler {
         return new ErrorResponse(e.getErrorCode(), e.getErrorMessage());
     }
 
+    @ExceptionHandler(SecurityException.class)
+    public ErrorResponse handleAccountException(SecurityException e) {
+        log.error("'{}':'{}'", e.getErrorCode(),e.getErrorMessage());
+
+        return new ErrorResponse(e.getErrorCode(), e.getErrorMessage());
+    }
+
     @ExceptionHandler(MethodArgumentNotValidException.class)
     public ErrorResponse handleMethodArgumentNotValidException(MethodArgumentNotValidException e) {
         log.error("MethodArgumentNotValidException is occurred.", e);
