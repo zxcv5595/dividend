@@ -26,7 +26,7 @@ public class ScraperScheduler {
     private final Scraper yahooFinanceScraper;
 
     //일정 주기마다 실행
-    @CacheEvict(value = CacheKey.KEY_FINANCE,allEntries = true)
+    @CacheEvict(value = CacheKey.KEY_FINANCE, allEntries = true)
     @Scheduled(cron = "${scheduler.scrap.yahoo}")
     public void YahooFinanceScheduling() {
         log.info("scraping scheduler is started ");
@@ -43,6 +43,7 @@ public class ScraperScheduler {
                         boolean exists = dividendRepository.existsByCompanyIdAndDate(e.getCompanyId(), e.getDate());
                         if (!exists) {
                             dividendRepository.save(e);
+                            log.info("insert new dividend -> '{}'", e.toString());
                         }
                     });
 

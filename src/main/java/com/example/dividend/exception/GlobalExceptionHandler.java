@@ -3,12 +3,13 @@ package com.example.dividend.exception;
 import com.example.dividend.dto.ErrorResponse;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.dao.DataIntegrityViolationException;
+import org.springframework.data.redis.RedisConnectionFailureException;
+import org.springframework.security.access.AccessDeniedException;
 import org.springframework.web.bind.MethodArgumentNotValidException;
 import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.RestControllerAdvice;
 
-import static com.example.dividend.type.ErrorCode.INTERNAL_SERVER_ERROR;
-import static com.example.dividend.type.ErrorCode.INVALID_REQUEST;
+import static com.example.dividend.type.ErrorCode.*;
 
 @Slf4j
 @RestControllerAdvice
@@ -16,14 +17,14 @@ public class GlobalExceptionHandler {
 
     @ExceptionHandler(ScrapException.class)
     public ErrorResponse handleAccountException(ScrapException e) {
-        log.error("'{}':'{}'", e.getErrorCode(),e.getErrorMessage());
+        log.error("'{}':'{}'", e.getErrorCode(), e.getErrorMessage());
 
         return new ErrorResponse(e.getErrorCode(), e.getErrorMessage());
     }
 
     @ExceptionHandler(SecurityException.class)
     public ErrorResponse handleAccountException(SecurityException e) {
-        log.error("'{}':'{}'", e.getErrorCode(),e.getErrorMessage());
+        log.error("'{}':'{}'", e.getErrorCode(), e.getErrorMessage());
 
         return new ErrorResponse(e.getErrorCode(), e.getErrorMessage());
     }
@@ -40,6 +41,21 @@ public class GlobalExceptionHandler {
         log.error("DataIntegrityViolationException is occurred.", e);
 
         return new ErrorResponse(INVALID_REQUEST, INVALID_REQUEST.getDescription());
+    }
+
+    @ExceptionHandler(AccessDeniedException.class)
+    public ErrorResponse handleAccessDeniedException(AccessDeniedException e) {
+        log.error("AccessDeniedException is occurred", e);
+
+        return new ErrorResponse(ACCESS_DENIED
+                , ACCESS_DENIED.getDescription());
+    }
+
+    @ExceptionHandler(RedisConnectionFailureException.class)
+    public ErrorResponse handleRedisConnectionFailureException(RedisConnectionFailureException e) {
+        log.error("RedisConnectionFailureException is occurred");
+        return new ErrorResponse(FAIL_TO_CONNECT_REDIS_SERVER,
+                FAIL_TO_CONNECT_REDIS_SERVER.getDescription());
     }
 
     @ExceptionHandler(Exception.class)
