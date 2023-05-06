@@ -7,6 +7,7 @@ import com.example.dividend.repository.MemberRepository;
 import com.example.dividend.type.ErrorCode;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.http.HttpStatus;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
@@ -34,7 +35,7 @@ public class MemberService implements UserDetailsService {
     public Member register(Auth.SignUp member) {
         boolean exists = memberRepository.existsByUsername(member.getUsername());
         if (exists) {
-            throw new SecurityException(ALREADY_EXIST_USER);
+            throw new SecurityException(ALREADY_EXIST_USER, HttpStatus.BAD_REQUEST);
         }
 
         member.setPassword(passwordEncoder.encode(member.getPassword()));
@@ -44,10 +45,10 @@ public class MemberService implements UserDetailsService {
 
     public Member authenticate(Auth.SignIn member) {
         Member user = memberRepository.findByUsername(member.getUsername())
-                .orElseThrow(() -> new SecurityException(NOT_EXIST_ID));
+                .orElseThrow(() -> new SecurityException(NOT_EXIST_ID,HttpStatus.BAD_REQUEST));
 
         if(!passwordEncoder.matches(member.getPassword(), user.getPassword())){
-            throw new SecurityException(NOT_MATCHED_PASSWORD);
+            throw new SecurityException(NOT_MATCHED_PASSWORD,HttpStatus.BAD_REQUEST);
         }
         return user;
     }

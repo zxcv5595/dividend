@@ -13,6 +13,7 @@ import org.apache.commons.collections4.Trie;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
+import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.util.ObjectUtils;
@@ -36,7 +37,7 @@ public class CompanyService {
     public CompanyDto save(String ticker) {
         boolean exists = companyRepository.existsByTicker(ticker);
         if (exists) {
-            throw new ScrapException(ALREADY_SAVED_COMPANY);
+            throw new ScrapException(ALREADY_SAVED_COMPANY, HttpStatus.BAD_REQUEST);
         }
         return storeCompanyAndDividend(ticker);
     }
@@ -49,7 +50,7 @@ public class CompanyService {
         CompanyDto companyDto = yahooFinanceScraper.scrapCompanyByTicker(ticker);
 
         if (ObjectUtils.isEmpty(companyDto)) {
-            throw new ScrapException(NOT_EXIST_COMPANY);
+            throw new ScrapException(NOT_EXIST_COMPANY, HttpStatus.BAD_REQUEST);
         }
 
         Company company = companyRepository.save(new Company(companyDto));
@@ -90,7 +91,7 @@ public class CompanyService {
 
     public String deleteCompany(String ticker) {
         Company company = companyRepository.findByTicker(ticker)
-                .orElseThrow(() -> new ScrapException(NOT_EXIST_COMPANY));
+                .orElseThrow(() -> new ScrapException(NOT_EXIST_COMPANY, HttpStatus.BAD_REQUEST));
         dividendRepository.deleteByCompanyId(company.getId());
         companyRepository.delete(company);
 
