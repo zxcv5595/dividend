@@ -13,7 +13,7 @@ public class ErrorResponse {
     private ErrorCode errorCode;
     private String errorMessage;
 
-    private HttpStatus statusCode;
+    private int statusCode;
 
     public ErrorResponse(ErrorCode errorCode,String errorMessage){
         this.errorCode=errorCode;

@@ -20,28 +20,28 @@ public class GlobalExceptionHandler {
     public ErrorResponse handleAccountException(ScrapException e) {
         log.error("'{}':'{}'", e.getErrorCode(), e.getErrorMessage());
 
-        return new ErrorResponse(e.getErrorCode(), e.getErrorMessage(),e.getStatusCode());
+        return new ErrorResponse(e.getErrorCode(), e.getErrorMessage(),e.getStatusCode().value());
     }
 
     @ExceptionHandler(SecurityException.class)
     public ErrorResponse handleAccountException(SecurityException e) {
         log.error("'{}':'{}'", e.getErrorCode(), e.getErrorMessage());
 
-        return new ErrorResponse(e.getErrorCode(), e.getErrorMessage(),e.getStatusCode());
+        return new ErrorResponse(e.getErrorCode(), e.getErrorMessage(),e.getStatusCode().value());
     }
 
     @ExceptionHandler(MethodArgumentNotValidException.class)
     public ErrorResponse handleMethodArgumentNotValidException(MethodArgumentNotValidException e) {
         log.error("MethodArgumentNotValidException is occurred.", e);
 
-        return new ErrorResponse(INVALID_REQUEST, INVALID_REQUEST.getDescription(), HttpStatus.BAD_REQUEST);
+        return new ErrorResponse(INVALID_REQUEST, INVALID_REQUEST.getDescription(), HttpStatus.BAD_REQUEST.value());
     }
 
     @ExceptionHandler(DataIntegrityViolationException.class)
     public ErrorResponse handleDataIntegrityViolationException(DataIntegrityViolationException e) {
         log.error("DataIntegrityViolationException is occurred.", e);
 
-        return new ErrorResponse(INVALID_REQUEST, INVALID_REQUEST.getDescription(),HttpStatus.BAD_REQUEST);
+        return new ErrorResponse(INVALID_REQUEST, INVALID_REQUEST.getDescription(),HttpStatus.BAD_REQUEST.value());
     }
 
     @ExceptionHandler(AccessDeniedException.class)
@@ -49,14 +49,14 @@ public class GlobalExceptionHandler {
         log.error("AccessDeniedException is occurred", e);
 
         return new ErrorResponse(ACCESS_DENIED
-                , ACCESS_DENIED.getDescription(),HttpStatus.UNAUTHORIZED);
+                , ACCESS_DENIED.getDescription(),HttpStatus.FORBIDDEN.value());
     }
 
     @ExceptionHandler(RedisConnectionFailureException.class)
     public ErrorResponse handleRedisConnectionFailureException(RedisConnectionFailureException e) {
         log.error("RedisConnectionFailureException is occurred");
         return new ErrorResponse(FAIL_TO_CONNECT_REDIS_SERVER,
-                FAIL_TO_CONNECT_REDIS_SERVER.getDescription(),HttpStatus.INTERNAL_SERVER_ERROR);
+                FAIL_TO_CONNECT_REDIS_SERVER.getDescription(),HttpStatus.INTERNAL_SERVER_ERROR.value());
     }
 
     @ExceptionHandler(Exception.class)
@@ -65,7 +65,7 @@ public class GlobalExceptionHandler {
 
         return new ErrorResponse(
                 INTERNAL_SERVER_ERROR,
-                INTERNAL_SERVER_ERROR.getDescription(),HttpStatus.INTERNAL_SERVER_ERROR
+                INTERNAL_SERVER_ERROR.getDescription(),HttpStatus.INTERNAL_SERVER_ERROR.value()
         );
     }
 }
